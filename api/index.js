@@ -15,8 +15,7 @@ mongoose
 });
 
 const app= express();
-app.use(express.json());
-//this will allow insomia to take input in backend
+app.use(express.json()); //this will allow insomia to take input in backend
 
 
 
@@ -26,3 +25,16 @@ app.listen(7382,() =>{
 
 app.use('/api/user',userRoutes);
 app.use('/api/auth', authRoutes);
+
+
+
+//use of middleware
+app.use((err, req, res,next) => {
+    const statusCode = err.statusCode||500;
+    const message = err.message || 'Internal server error';
+    res.status(statusCode).json({
+        success:false,
+        statusCode,
+        message
+    })
+});
