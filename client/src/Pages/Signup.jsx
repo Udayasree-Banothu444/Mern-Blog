@@ -1,8 +1,59 @@
-import { Button, Label, TextInput } from 'flowbite-react'
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { data } from 'autoprefixer';
+import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
+import { useState } from 'react';
+// import React from 'react'
+import { Link , useNavigate} from 'react-router-dom'
 
 export default function Signup() {
+  
+  const [formData, setFormData] = useState({});
+  const [errorMessage, setErrorMessage]= useState(null); //when user first uses space and then writes its username
+  const [loading, setLoading] = useState(false); //for loading the request
+  const navigate = useNavigate(); // on successfull signup it will directly take you to signin page
+
+
+
+  const handleChange =(e) =>{
+    // console.log(e.target.value); -this will show changes without any particular id
+    setFormData({...formData, [e.target.id]:e.target.value.trim()}); //this will show changes with unique id, here ...formdata will keep track of previous changes also
+  };
+  // console.log(formData); show the change
+
+  const handleSubmit = async(e) => { //async becuase after submiting form it takes a while to check the details
+    e.preventDefault();  //after submit it automatically refreshes the page so for not doing that set to its default mode
+    
+    if(!formData.username || !formData.email ||!formData.password){
+      return setErrorMessage('PLease fill out all the fields required');
+    }
+    
+    
+    try{ //here as both backend and frontend are running in 2 diff proxies we have to change it so 
+      setLoading(true);
+      setErrorMessage(null);
+      const res = await fetch('/api/auth/signup',{
+         method:'POST',
+         headers:{'Content-Type':'application/json'},
+         body:JSON.stringify(formData),
+      });
+      const data= await res.json();
+      if(data.success === false){ // this error will show when user signup with the same name of already present user
+        return setErrorMessage(data.message);
+      }
+      setLoading(false);
+
+      if(res.ok){
+        navigate('/sign-in'); //if all done then it navigates/re-directed to signin page
+      }
+    } 
+    catch(error){
+       setErrorMessage(error.message); //this will show when the client have internet issues 
+       setLoading(false);
+    }
+  }
+  
+
+
+
   return (// <div>Signup</div>
     <div className='min-h-screen mt-20'>  {/* added a minimum height so that when we decrese the screen size the footer presnt at the bottom should also have space */}
       
@@ -30,33 +81,45 @@ export default function Signup() {
 
         {/* right side */}
         <div className='flex-1'> {/*flex will equally give space for both left and right side */}
-          <form className='flex flex-col gap-4'>
+          <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
             <div>
               <Label value='Your Username' /> 
               <TextInput
                 type='text'
                 placeholder='Username'
                 id='username'
+                onChange={handleChange} 
               />              
             </div>
             <div>
               <Label value='Your Email' /> 
               <TextInput
-                type='text'
+                type='email'
                 placeholder='Email'
                 id='email'
+                onChange={handleChange} 
               />              
             </div>
             <div>
               <Label value='Your Password' /> 
               <TextInput
-                type='text'
+                type='password'
                 placeholder='password'
                 id='password'
+                onChange={handleChange}  
               />              
             </div>
-            <Button gradientDuoTone='purpleToPink' type='submit'>
-              Sign Up
+            <Button gradientDuoTone='purpleToPink' type='submit' disabled={loading}>  {/*when the form is submited we will disbale the loading */}
+              {
+                loading ?(
+                  <>
+                  <Spinner size='sm'/>
+                  <span className='pl-3'>Loading... </span>
+                  </>
+
+                ): 'Sign Up'
+              }
+              
             </Button>
             
           </form>
@@ -65,6 +128,14 @@ export default function Signup() {
             <span> Have an account?</span>
             <Link to='/sign-in' className='text-blue-500'>Sign In</Link>
           </div>
+
+          {  //this will work when an error occur like some fields are not filled and submitted the form 
+            errorMessage && (
+              <Alert className='mt-5' color='failure'>
+                {errorMessage}
+              </Alert>
+            )
+          }
 
         </div>  
 
