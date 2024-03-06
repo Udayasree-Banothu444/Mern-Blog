@@ -1,15 +1,21 @@
 import { data } from 'autoprefixer';
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
 import { useState } from 'react';
-// import React from 'react'
-import { Link , useNavigate} from 'react-router-dom'
+import { Link , useNavigate} from 'react-router-dom';
+import { useDispatch , useSelector} from 'react-redux';
+import { signInStart, signInSuccess ,signInFailure} from '../redux/user/userSlice.js';
+
+
 
 export default function Signin() {
   
   const [formData, setFormData] = useState({});
-  const [errorMessage, setErrorMessage]= useState(null); //when user first uses space and then writes its username
-  const [loading, setLoading] = useState(false); //for loading the request
+  // const [errorMessage, setErrorMessage]= useState(null); //when user first uses space and then writes its username
+  // const [loading, setLoading] = useState(false); //for loading the request
+  const {loading, error: errorMessage} = useSelector(state=> state.user);//same as above 2 commented ones 
+  const dispatch = useDispatch();
   const navigate = useNavigate(); // on successfull signup it will directly take you to signin page
+  
 
 
 
@@ -23,31 +29,38 @@ export default function Signin() {
     e.preventDefault();  //after submit it automatically refreshes the page so for not doing that set to its default mode
     
     if(!formData.email ||!formData.password){
-      return setErrorMessage('PLease fill out all the fields required');
+      // return setErrorMessage('PLease fill out all the fields required');
+      return dispatch(signInFailure('PLease fill out all the fields required'));
     }
     
     
     try{ //here as both backend and frontend are running in 2 diff proxies we have to change it so 
-      setLoading(true);
-      setErrorMessage(null);
+      // setLoading(true);
+      // setErrorMessage(null);
+      dispatch(signInStart()); //these dispatch functions are from userSlice.js
       const res = await fetch('/api/auth/signin',{
          method:'POST',
          headers:{'Content-Type':'application/json'},
          body:JSON.stringify(formData),
       });
       const data= await res.json();
+
+
       if(data.success === false){ // this error will show when user signup with the same name of already present user
-        return setErrorMessage(data.message);
+        // return setErrorMessage(data.message);
+        dispatch(signInFailure(data.message));
       }
-      setLoading(false);
+      // setLoading(false); not required blz dispatch signinfailure will make loading to false
 
       if(res.ok){
+        dispatch(signInSuccess(data)); //data is payload
         navigate('/'); //if all done then it navigates/re-directed to signin page
       }
     } 
     catch(error){
-       setErrorMessage(error.message); //this will show when the client have internet issues 
-       setLoading(false);
+      //  setErrorMessage(error.message); //this will show when the client have internet issues 
+      //  setLoading(false);
+      dispatch(signInFailure(error.message));
     }
   }
   
