@@ -48,15 +48,13 @@ export const signin =async(req,res,next) => {
         if(!validPassword){
             return next(errorHandler(404,'Invalid Password'));
         }
-        const token = jwt.sign(
-        { id: validUser._id }, process.env.JWT_SECRET ); /*JWT_SECRET is a secret key whihc is know to the user only so that is included in .env file and here just using the reference name only */
+        const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET ); /*JWT_SECRET is a secret key whihc is know to the user only so that is included in .env file and here just using the reference name only */
         
 
         const{password: pass, ...rest}= validUser._doc;
 
         res.status(200).cookie('access_token',token,{
-            httpOnly: true
-        }).json('rest'); /*creating a response using cookie*/
+            httpOnly: true}).json(rest); /*creating a response using cookie*/
 
         
     }
