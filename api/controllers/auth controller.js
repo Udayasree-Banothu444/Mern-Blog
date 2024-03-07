@@ -62,4 +62,47 @@ export const signin =async(req,res,next) => {
         next(error);
     }
 
+};
+
+
+
+export const google = async (req, res, next) =>{
+    //first check if user exsits or not , if exsits then signin if not create a new user
+    const{email, name, googlePhotoURL} = req.body; //this data is all we required to check the user which comes form oAuth.jsx
+    try{
+        const user = await User.findOne({email}); //check if user exist by passing the email
+        if(user){ //if present then create a token
+            const token = jwt.sign({id:user._id}, process.env.JWT_SECRET);
+            const {password, ...rest} =user._doc; //seperate the password and the rest from user._doc
+            res.status(200).cookie('access_token', token,{
+                httpOnly:true, //to make more secure
+            }).json(rest);
+        }
+        else{
+            //Here at the time of signin we need the password so at first we will generate a random password and after they can change their password
+            const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            //generate a random password with 36 charcaters from 0-9 and form a-z
+            const hashedPassword = bcryptjs.hashSync(generatedPassword,10);
+            const newUser = new User({
+                username: name.toLowerCase().split(' ').join('')+ Math.random().toString(9).slice(-4), //9 will be adding only numbers from 0 -9
+                //if username is Udaya sree then there can be multiple users wth the same name so it should be converted it into Udayasree2239393 some random no at the end
+                email, 
+                password: hashedPassword,
+                profilePicture: googlePhotoURL,
+            });
+            await newUser.save(); //save the newuser
+            const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET);
+            const{password, ...rest} = newUser._doc;
+            res.status(200).cookie('access_token', token,{
+                httpOnly: true,
+            }).json(rest);
+
+        }
+
+ 
+    } catch(error){
+        next(error);
+    }
+
+
 }
