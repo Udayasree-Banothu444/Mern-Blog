@@ -2,14 +2,18 @@ import React from 'react'
 import { Avatar, Button, Dropdown, DropdownDivider, Navbar, TextInput } from 'flowbite-react'
 import { Link ,useLocation} from 'react-router-dom'//when you click that it will go to that page without refreshing the current page
 import {AiOutlineSearch} from 'react-icons/ai'
-import {FaMoon} from 'react-icons/fa'
-import {useSelector} from 'react-redux' //this will give the info if the user is authenticated or not
+import {FaMoon, FaSun} from 'react-icons/fa'
+import {useSelector, useDispatch} from 'react-redux' //this will give the info if the user is authenticated or not
+// import { UseDispatch } from 'react-redux' //will give the functionality
+import { toogleTheme } from '../redux/theme/themeSlice.js' //to change the theme
 
 
 export default function Header() {
     const path=useLocation().pathname;
     //to active the links to move from one page to other whne we click the links
     const {currentUser} = useSelector(state => state.user); //givs the currentuser info
+    const dispatch = useDispatch();
+    const {theme} =useSelector(state =>state.theme);//to get the theme
   return (
     // <div>Header</div>
     //<Navbar>Header</Navbar> just to move side wase a little bit
@@ -44,9 +48,10 @@ export default function Header() {
         {/* Here in this div calss we will be going to create 2 buttons, 1-light&dark, 2-sign in */}
             {/* flex gap-2 will align those 2 buttons side by side */}
         <div className='flex gap-2 md:order-2'> 
-            <Button className='w-12 h-10 hidden sm:inline' color='gray' pill>
-                <FaMoon/>
-                {/* this button is for dark mode and light mode */}
+            <Button className='w-12 h-10 hidden sm:inline' color='gray' pill 
+            onClick={()=>dispatch(toogleTheme())}>
+                {theme ==='light'?<FaSun/> : <FaMoon/>} {/*if theme is light then it shows sun and if dark shows moon */}
+                {/* <famoon/> */}{/* this button is for dark mode and light mode */}
             </Button>
 
             {/* this has to show only when current user doesnt exsist */}
