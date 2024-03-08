@@ -1,13 +1,15 @@
 import React from 'react'
-import { Button, Navbar, TextInput } from 'flowbite-react'
+import { Avatar, Button, Dropdown, DropdownDivider, Navbar, TextInput } from 'flowbite-react'
 import { Link ,useLocation} from 'react-router-dom'//when you click that it will go to that page without refreshing the current page
 import {AiOutlineSearch} from 'react-icons/ai'
 import {FaMoon} from 'react-icons/fa'
+import {useSelector} from 'react-redux' //this will give the info if the user is authenticated or not
 
 
 export default function Header() {
     const path=useLocation().pathname;
     //to active the links to move from one page to other whne we click the links
+    const {currentUser} = useSelector(state => state.user); //givs the currentuser info
   return (
     // <div>Header</div>
     //<Navbar>Header</Navbar> just to move side wase a little bit
@@ -47,11 +49,45 @@ export default function Header() {
                 {/* this button is for dark mode and light mode */}
             </Button>
 
-            <Link to='/sign-in'>
+            {/* this has to show only when current user doesnt exsist */}
+
+            {currentUser ? (  //if user exsits then shows dropdown 
+                <Dropdown
+                   arrowIcon={false}
+                   inline
+                   label={
+                      <Avatar
+                        alt='user'
+                        img= {currentUser.profilePicture}
+                        rounded
+                      />
+                   }
+                >
+                    <Dropdown.Header>
+                        <span className='block text-sm'> @{currentUser.username}</span>
+                        <span className='block text-sm font-medium truncate'> {currentUser.email}</span>
+                    </Dropdown.Header>
+
+                    <Link to ='/dashboard?tab=profile'>
+                        <Dropdown.Item>Profile</Dropdown.Item>
+                    </Link>
+
+                    <DropdownDivider/>
+
+                    <Dropdown.Item> Sign out</Dropdown.Item>
+
+
+                </Dropdown>
+            ):
+            (  //if user doesnt exsits it will show signin
+                <Link to='/sign-in'>
                 <Button gradientDuoTone='purpleToBlue' outline>
-                Sign In
+                     Sign In
                 </Button>
-            </Link>
+                </Link>
+            )
+            }
+            
 
             <Navbar.Toggle/>
             {/* this will act as a dropdown button */}

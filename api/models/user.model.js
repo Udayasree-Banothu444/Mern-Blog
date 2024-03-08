@@ -14,7 +14,11 @@ const userSchema = new mongoose.Schema({
     password: {
         type:String,
         required:true,
-    },    
+    },   
+    profilePicture:{
+        type:String,
+        default:"https://thenode.biologists.com/wp-content/uploads/2021/03/New-Author-Icon.png ",
+    },
 }, {timestamps: true}
 );
 
