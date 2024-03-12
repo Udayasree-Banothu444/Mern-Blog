@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRoutes from './route/user.router.js';
 import authRoutes from './route/auth route.js';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 mongoose
@@ -16,6 +17,7 @@ mongoose
 
 const app= express();
 app.use(express.json()); //this will allow insomia to take input in backend
+app.use(cookieParser());//can extract cookie from browser
 
 
 
