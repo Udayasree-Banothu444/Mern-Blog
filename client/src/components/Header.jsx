@@ -4,8 +4,9 @@ import { Link ,useLocation} from 'react-router-dom'//when you click that it will
 import {AiOutlineSearch} from 'react-icons/ai'
 import {FaMoon, FaSun} from 'react-icons/fa'
 import {useSelector, useDispatch} from 'react-redux' //this will give the info if the user is authenticated or not
-// import { UseDispatch } from 'react-redux' //will give the functionality
+ //import { UseDispatch } from 'react-redux' //will give the functionality
 import { toogleTheme } from '../redux/theme/themeSlice.js' //to change the theme
+import { signoutSuccess } from '../redux/user/userSlice.js'
 
 
 export default function Header() {
@@ -14,6 +15,28 @@ export default function Header() {
     const {currentUser} = useSelector(state => state.user); //givs the currentuser info
     const dispatch = useDispatch();
     const {theme} =useSelector(state =>state.theme);//to get the theme
+
+   //for signout in header component
+    const handleSignout =async()=>{
+        try{
+          const res = await fetch(`/api/user/signout`,{
+            method:'POST',
+          });
+          const data = await res.json();
+          if(!res.ok){
+            console.log(data.message);
+          }
+          else{
+            dispatch(signoutSuccess());
+          }
+        }
+        catch(error){
+          console.log(error.message);
+        }
+    
+      };
+
+
   return (
     // <div>Header</div>
     //<Navbar>Header</Navbar> just to move side wase a little bit
@@ -79,7 +102,7 @@ export default function Header() {
 
                     <DropdownDivider/>
 
-                    <Dropdown.Item> Sign out</Dropdown.Item>
+                    <Dropdown.Item onClick={handleSignout}> Sign out</Dropdown.Item>
 
 
                 </Dropdown>
