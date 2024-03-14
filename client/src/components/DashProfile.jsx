@@ -1,15 +1,16 @@
-import { Alert, Button, TextInput } from 'flowbite-react';
+import { Alert, Button, Modal, ModalHeader, TextInput } from 'flowbite-react';
 import React, { useEffect, useRef, useState } from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/storage'; //after firebase version 9 we use getStorage
 import {app} from '../firebase' ;//app form firebase
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { updateStart, updateSuccess, updateFailure } from '../redux/user/userSlice';
+import { updateStart, updateSuccess, updateFailure ,deleteUserStart, deleteUserSuccess,deleteUserFailure} from '../redux/user/userSlice';
+import {HiOutlineExclamationCircle} from 'react-icons/hi';
 
 
 export default function DashProfile() {
-    const {currentUser} = useSelector(state => state.user);
+    const {currentUser, error} = useSelector(state => state.user);
     const [imageFile, setImageFile] = useState(null);
     const [imageFileUrl,setImageFileUrl] = useState(null);
     const filePickerRef =useRef(); //this will be used directly on image like if we click on image it will take you to select other images
@@ -21,6 +22,9 @@ export default function DashProfile() {
     const [imageFileUploading, setImageFileUploading]=useState(false); //to check if image is 100% uploaded
     const [updateUserSuccess, setUpdateUserSuccess] =useState(null);//to see the img is successfully updated, it will show img is updated
     const [updateUserError, setupdateUserError] = useState(null); //when user try to upload the same img it will show the msg
+
+    //for delete the user
+    const[showModel, setshowModel]= useState(false);
 
 
     const handleImageChange=(e) =>{
@@ -127,6 +131,30 @@ export default function DashProfile() {
       setupdateUserError(error.message);
     }
   };
+  
+
+  //this function is called when the user clicks on yes, i'm sure to delete this account then
+  const handleDeleteUser =async(req, res, next)=>{
+    setshowModel(false); //blz after clicking delete it show go to home page & shouldnot remain in the dashboard
+    try{
+      dispatch(deleteUserStart());
+      const res= await fetch(`/api/user/delete/${currentUser._id}`,{
+        method:'DELETE',
+      });
+      const data = await res.json();
+      if(!res.ok){
+        dispatch(deleteUserFailure(data.message));
+      }
+      else{
+        dispatch(deleteUserSuccess(data));
+      }
+    }
+    catch(error){
+      dispatch(deleteUserFailure(error.message));
+
+    }
+
+  };
 
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
@@ -147,7 +175,7 @@ export default function DashProfile() {
           {imageFileUploadingProgress && (
             <CircularProgressbar 
                value={imageFileUploadingProgress || 0} 
-               text={'${imageFileUploadingProgress}%'}
+               text={`${imageFileUploadingProgress}%`}
                strokeWidth={5}
                styles={{
                 root:{
@@ -191,7 +219,7 @@ export default function DashProfile() {
       </form>
 
       <div className='text-red-500 flex justify-between mt-5'>
-        <span className='cursor-pointer'>Delete Account</span>
+        <span onClick={()=>setshowModel(true)} className='cursor-pointer'>Delete Account</span>
         <span className='cursor-pointer'>SignOut</span>
       </div>
 
@@ -206,6 +234,44 @@ export default function DashProfile() {
           {updateUserError}
         </Alert>
       )}
+
+      {/* error message for delete function */}
+      {error && (
+        <Alert color='failure' className='mt-5'> 
+          {error}
+        </Alert>
+      )}
+
+
+      <Modal 
+         show={showModel} 
+         onClose={()=>setshowModel(false)} 
+         popup 
+         size='md'>
+          <Modal.Header/> {/*it just show a popup window whihc can be closed */}
+            
+            <Modal.Body>
+              <div className='text-center'>
+                <HiOutlineExclamationCircle 
+                    className='h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto'/>
+                <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-400'>Are you sure ! You want to delete your account?</h3>
+                <div className='flex justify-center gap-4'>
+                  <Button color='failure' onClick={handleDeleteUser}>
+                    Yes,I'm sure
+                  </Button>
+
+                  <Button color='gray' onClick={()=>setshowModel(false)}>
+                    No, cancel
+                  </Button>
+
+                </div>
+
+              </div>
+
+            
+            </Modal.Body> 
+
+      </Modal>
 
     </div>
   );
