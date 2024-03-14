@@ -64,6 +64,24 @@ export const updateUser=async(req, res, next)=>{
 };
 
 
+export const deleteUser= async(req, res, next) =>{
+    //user is owner of the account then only he/she can delete
+    if(req.user.id !== req.params.userId){ 
+        //if the userid from cookie is not same as the id provided
+       return next(errorHandler(403,"You are not allowed to delete this account"));
+    }
+    try{
+        await User.findByIdAndDelete(req.params.userId);
+        res.status(200).json("User has been deleted");
+ 
+    }
+    catch(error){
+        next(error); //middleware
+    }
+
+};
+
+
         
 
 
