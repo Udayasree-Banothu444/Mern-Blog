@@ -12,5 +12,6 @@ router.put('/update/:userId',verifyToken,  updateUser); //just to update we use 
 router.delete('/delete/:userId', verifyToken, deleteUser); //to delete an account
 router.post('/signout', signout); //to signout here no need of token blz anyone can do signout
 
+
 export default router;
 

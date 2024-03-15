@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import userRoutes from './route/user.router.js';
 import authRoutes from './route/auth route.js';
 import cookieParser from 'cookie-parser';
+import postRoutes from './route/post.route.js';
 
 dotenv.config();
 mongoose
@@ -27,6 +28,7 @@ app.listen(7382,() =>{
 
 app.use('/api/user',userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/post', postRoutes);
 
 
 
