@@ -7,10 +7,11 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { updateStart, updateSuccess, updateFailure ,deleteUserStart, deleteUserSuccess,deleteUserFailure, signoutSuccess} from '../redux/user/userSlice';
 import {HiOutlineExclamationCircle} from 'react-icons/hi';
+import { Link } from 'react-router-dom';
 
 
 export default function DashProfile() {
-    const {currentUser, error} = useSelector(state => state.user);
+    const {currentUser, error , loading} = useSelector(state => state.user);
     const [imageFile, setImageFile] = useState(null);
     const [imageFileUrl,setImageFileUrl] = useState(null);
     const filePickerRef =useRef(); //this will be used directly on image like if we click on image it will take you to select other images
@@ -232,9 +233,31 @@ export default function DashProfile() {
 
         <TextInput type='password' id='password' placeholder='password' onChange={handleChange}/>
 
-        <Button type='sumbit' gradientDuoTone='purpleToBlue' outline>
-            Update
+        <Button 
+          type='sumbit' 
+          gradientDuoTone='purpleToBlue' 
+          outline 
+          disabled={loading || imageFileUploading}>
+            {/* Update */}
+          {loading ? 'Loading...':'Update'}
         </Button>
+
+
+        {/* will be showing an extra button to admin only to create a post */}
+        {
+          currentUser.isAdmin && (
+            <Link to={'/create-post'}>
+              <Button
+               type='button'
+               gradientDuoTone='purpleToPink'
+               className='w-full'>
+                Create a Post
+              </Button>
+            
+            </Link>
+            
+          )
+        }
       </form>
 
       <div className='text-red-500 flex justify-between mt-5'>
