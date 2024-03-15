@@ -31,7 +31,7 @@ export const signup = async (req, res, next)   => {
     };
 };
 
-
+//SIGNIN FUNCTION
 export const signin =async(req,res,next) => {
     const {email, password} = req.body;
 
@@ -48,8 +48,8 @@ export const signin =async(req,res,next) => {
         if(!validPassword){
             return next(errorHandler(404,'Invalid Password'));
         }
-        const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET ); /*JWT_SECRET is a secret key whihc is know to the user only so that is included in .env file and here just using the reference name only */
-        
+        const token = jwt.sign({ id: validUser._id , isAdmin:validUser.isAdmin}, process.env.JWT_SECRET ); /*JWT_SECRET is a secret key whihc is know to the user only so that is included in .env file and here just using the reference name only */
+        //added isAdmin:validUSer.isAdmin to see if the signin in user is an admin or not
 
         const{password: pass, ...rest}= validUser._doc;
 
@@ -72,7 +72,7 @@ export const google = async (req, res, next) =>{
     try{
         const user = await User.findOne({email}); //check if user exist by passing the email
         if(user){ //if present then create a token
-            const token = jwt.sign({id:user._id}, process.env.JWT_SECRET);
+            const token = jwt.sign({id:user._id, isAdmin: user.isAdmin}, process.env.JWT_SECRET);
             const {password, ...rest} =user._doc; //seperate the password and the rest from user._doc
             res.status(200).cookie('access_token', token,{
                 httpOnly:true, //to make more secure
@@ -91,7 +91,7 @@ export const google = async (req, res, next) =>{
                 profilePicture: googlePhotoURL,
             });
             await newUser.save(); //save the newuser
-            const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET);
+            const token = jwt.sign({id: newUser._id, isAdmin: newUser.isAdmin}, process.env.JWT_SECRET);
             const{password, ...rest} = newUser._doc;
             res.status(200).cookie('access_token', token,{
                 httpOnly: true,

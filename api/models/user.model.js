@@ -19,6 +19,13 @@ const userSchema = new mongoose.Schema({
         type:String,
         default:"https://thenode.biologists.com/wp-content/uploads/2021/03/New-Author-Icon.png ",
     },
+    //till here all the parameters will remain same for both admin and user..but now it will change
+
+    isAdmin:{
+        type:Boolean,
+        default:false,
+    },
+
 }, {timestamps: true}
 );
 
