@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {useSelector} from 'react-redux';
-import { Table } from 'flowbite-react';
+import { Button, Table } from 'flowbite-react';
 import { Link } from 'react-router-dom';
 
 export default function DashPosts() {
   const {currentUser} = useSelector(state=>state.user);
   const [userPosts, setUserPosts]= useState([]);
+  const[showMore, setShowMore] =useState(true);
   console.log(userPosts);
   useEffect(() =>{
     //IF WE USE ASYNC IN USEEFFECT DIRECTLY IT WILL CAUSE AN ERROR SO CREATE A FUNCTION AND USE IT
@@ -15,6 +16,9 @@ export default function DashPosts() {
         const data = await res.json();
         if(res.ok){
           setUserPosts(data.posts);
+          if(data.length<9){
+            setShowMore(false);
+          }
         }
 
       }
@@ -28,6 +32,30 @@ export default function DashPosts() {
     }
 
   }, [currentUser._id]);
+
+ //show more
+  const handleShowMore=async()=>{
+    const startIndex =userPosts.length;
+    try{
+      const res = await fetch(`/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`);
+      const data= await res.json();
+      if(res.ok){
+        setUserPosts((prev)=>[...prev, ...data.posts]);
+        if(data.posts.length <9){
+          setShowMore(false);
+        }
+      }
+    }
+    catch(error){
+      console.log(error.message);
+
+    }
+
+ }
+
+
+
+
   return (
     <div className='table-auto 
      overflow-x-scroll 
@@ -103,6 +131,15 @@ export default function DashPosts() {
 
         ))}
       </Table>
+
+      {
+        showMore && (
+          <Button onClick={handleShowMore} className='w-full h-1 text-teal-100 self-center text-sm py-7'>
+            Show more   {/*when we click on showmore it show show other 9 posts*/}
+          </Button>
+        )
+
+      }
       </>
      ):(
       <p>You have no posts yet!</p>
