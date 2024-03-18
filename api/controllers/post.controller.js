@@ -2,7 +2,7 @@ import Post from "../models/post.model.js";
 import { errorHandler } from "../utils/error.js"
 
 export const create= async(req, res, next) =>{
-     console.log(req.user);
+    //  console.log(req.user);
     //check if the person is admin or not
     if(!req.user.isAdmin){
         return next(errorHandler(403, "You are not allowed to create a post"));
@@ -13,9 +13,9 @@ export const create= async(req, res, next) =>{
         return next(errorHandler(400, "Please provide all required fields"));
     }
 
-    const slug = req.body.title.split(' ').join('-').toLowerCase().replace(/[^a-zA-Z0-9]/g,'');
+    const slug = req.body.title.split(' ').join('-').toLowerCase().replace(/[^a-zA-Z0-9-]/g,'');
     const newPost = new Post({
-        ...req.body , slug, userId: req.user.id //the userID should be provided blz there can be multiple admins so we hvae to knoe who posted what?
+        ...req.body , slug, userId: req.user.id, //the userID should be provided blz there can be multiple admins so we hvae to knoe who posted what?
     });
 
     try{
@@ -26,7 +26,7 @@ export const create= async(req, res, next) =>{
     catch(error){
         next(error);
     }
-}
+};
 
 //this router can be user everywhere later
 export const getposts =async(req, res, next) =>{
@@ -34,19 +34,19 @@ export const getposts =async(req, res, next) =>{
         //first get some posts and then click on showmore to get the rest of them
         const startIndex = parseInt(req.query.startIndex)  || 0; //it is a number like start fetching from 9number likewise
         const limit =parseInt(req.query.limit) ||9; //first it will show 9 and then 9 
-        const sortDirection = req.query.order === 'asc' ? 1: -1;
+        const sortDirection = req.query.order === 'asc' ? 1: -1; //newst or oldest
         const posts= await Post.find({
-            ...(req.query.userId && {userId: req.query.userId}), 
-            ...(req.query.category && {category: req.query.userId}),
-            ...(req.query.slug && {category: req.query.slug}),
+            ...(req.query.userId && {userId: req.query.userId}),  //it can be a post from user
+            ...(req.query.category && {category: req.query.category}), //it can be from category
+            ...(req.query.slug && {slug: req.query.slug}),
             ...(req.query.postId && {_id: req.query.postId}),
-            ...(req.query.searchTerm && {
+            ...(req.query.searchTerm && { //we have search from both title and content
                 $or: [
-                    {title: {$regex: req.query.searchTerm, $options:'i'}},
+                    {title: {$regex: req.query.searchTerm, $options:'i'}},//option is set to i which means lowercase and upercase doesnt matter
                     {content: {$regex: req.query.searchTerm, $options:'i'}},
                 ],
             }),
-        }).sort({updatedAt : sortDirection}).skip(startIndex).limit(limit);
+        }).sort({updatedAt : sortDirection}).skip(startIndex).limit(limit); //in the inosmia when we send the link like localhost:7382/api/post/getposts?limit=1 it shows only 1 post
 
         
         const totalPosts =await Post.countDocuments(); // we want total no.of posts also
@@ -65,8 +65,6 @@ export const getposts =async(req, res, next) =>{
             totalPosts,
             lastMonthPosts,
         });
-
-
 
     }
     catch(error){
