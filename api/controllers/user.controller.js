@@ -90,7 +90,51 @@ export const signout= async (req, res,next) =>{
     }
 };
 
+//to check the data of users only for admin
+export const getUsers = async(req, res, next) =>{
+    if(!req.user.isAdmin){ //if you are not admin you cant see the users
+        return next(errorHandler(403, 'You are allowed to see all users'));
+    }
+    try{
+        //same as that of show posts  - first shows 9 posts and when click readmore shows again 9
+        const startIndex = parseInt(req.query.startIndex) ||0;
+        const limit = parseInt(req.query.limit) ||9;
+        const sortDirection = req.query.sort === 'asc' ? 1:-1;
 
+        const users = await User.find()
+        .sort({createdAt: sortDirection})
+        .skip(startIndex)
+        .limit(limit);
+
+        //this will also show the password of user which we dont want so remove the password
+        const usersWithoutPassword = users.map((user)=>{
+            const {password, ...rest} =user._doc;
+            return rest;
+        }); //gives an array of users without password
+
+        const totalUsers = await User.countDocuments();
+        const now = new Date();
+        const oneMonthAgo =new Date(
+            now.getFullYear(),
+            now.getMonth()-1,
+            now.getDate()
+        );
+        const lastMonthUsers = await User.countDocuments({
+            createdAt:{$gte: oneMonthAgo},
+        });
+
+        res.status(200).json({
+            users: usersWithoutPassword,
+            totalUsers,
+            lastMonthUsers,
+        });
+
+    }
+    catch(error){
+        next(error);
+    }
+
+};
         
 
 
