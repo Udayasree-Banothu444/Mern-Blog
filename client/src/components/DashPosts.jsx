@@ -72,7 +72,8 @@ const handleDeletePost =async()=>{
     }
     else{
       setUserPosts((prev)=>
-        prev.filter((post)=>post._id !== postIdToDelete)
+        prev.filter((post)=>post._id !== postIdToDelete),
+        setshowModel(false),
       );
     }
 
@@ -111,7 +112,7 @@ const handleDeletePost =async()=>{
           </Table.HeadCell>
         </Table.Head>
         {userPosts.map((post) => (
-          <Table.Body className='divide-y'>
+          <Table.Body  key={post._id} className='divide-y'>
             <Table.Row className='bgwhite dark:border-gray-700 dark:bg-gray-800'>
 
               {/* for date */}

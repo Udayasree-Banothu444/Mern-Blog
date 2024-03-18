@@ -4,11 +4,14 @@ import { verifyToken } from "../utils/verifyUser.js";
 import { create } from "../controllers/post.controller.js";
 import { getposts } from "../controllers/post.controller.js";
 import { deletepost } from "../controllers/post.controller.js";
+import { updatePost } from "../controllers/post.controller.js";
 
 const router= express.Router();
 
 router.post('/create', verifyToken, create);
 router.get('/getposts',getposts);//we dont want token blz anyone can view the posts
 router.delete('/deletepost/:postId/:userId', verifyToken , deletepost );//along with delete post we ave to check if the crct user is deleteing there own post or not 
+router.put('/updatepost/:postId/:userId',verifyToken, updatePost);
+
 
 export default router;
