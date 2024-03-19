@@ -63,10 +63,10 @@ export const updateUser=async(req, res, next)=>{
         }
 };
 
-
+//DELETE USER FROM BOTH POSTS PAGE AND USERS PAGE
 export const deleteUser= async(req, res, next) =>{
     //user is owner of the account then only he/she can delete
-    if(req.user.id !== req.params.userId){ 
+    if(!req.user.isAdmin && req.user.id !== req.params.userId){ 
         //if the userid from cookie is not same as the id provided
        return next(errorHandler(403,"You are not allowed to delete this account"));
     }
@@ -137,4 +137,8 @@ export const getUsers = async(req, res, next) =>{
 };
         
 
+// //delete an user in user page
+// export const deleteusers =async(req, res, next)=>{
+
+// };
 

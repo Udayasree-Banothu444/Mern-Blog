@@ -61,6 +61,26 @@ export default function DashUsers() {
 
 
  const handleDeleteUser =async(req, res, next)=>{
+  try{
+        const res = await fetch(`/api/user/delete/${userIdToDelete}`,{
+          method:'DELETE',
+        });
+        const data= await res.json();
+        if(!res.ok){
+          console.log(data.message);
+        }
+        else{6
+          setUsers((prev)=>
+            prev.filter((user)=>user._id !== userIdToDelete),
+            setshowModel(false),
+          );
+        }
+    
+      }
+      catch(error){
+        console.log(error.message);
+    
+      }
 
  };
 //when we click on yes, im sure in deleting the post this function works
