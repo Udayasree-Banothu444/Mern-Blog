@@ -5,6 +5,7 @@ import userRoutes from './route/user.router.js';
 import authRoutes from './route/auth route.js';
 import cookieParser from 'cookie-parser';
 import postRoutes from './route/post.route.js';
+import commentRoutes from './route/comment.route.js';
 
 dotenv.config();
 mongoose
@@ -29,16 +30,17 @@ app.listen(7382,() =>{
 app.use('/api/user',userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/post', postRoutes);
+app.use('/api/comment', commentRoutes);
 
 
 
 //use of middleware
-app.use((err, req, res,next) => {
+app.use((err, req, res, next) => {
     const statusCode = err.statusCode||500;
     const message = err.message || 'Internal server error';
     res.status(statusCode).json({
         success:false,
         statusCode,
         message
-    })
+    });
 });
