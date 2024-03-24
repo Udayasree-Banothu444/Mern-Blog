@@ -35,3 +35,29 @@ export const getPostComments = async (req, res, next) =>{
     }
 
 };
+
+
+//function to like a commnet , only once per comment per user
+export const likeComment = async (req, res, next)=>{
+    try{
+        const comment = await Comment.findById(req.params.commentId);
+        if(!comment){
+            return next(errorHandler(404,'Comment not found'));
+        }
+        //to check if the user already liked that comment...check inside the array of likes
+        const userIndex = comment.likes.indexOf(req.user.id);
+        if(userIndex === -1){
+            comment.numberOfLikes +=1; //if userIndex in not present in the array of likes then incrase the count of no.oflikes
+            comment.likes.push(req.user.id);
+        }
+        else{
+            comment.numberOfLikes -=1;
+            comment.likes.splice(userIndex, 1); //if already user is presnt in the array of likes then remove it
+        }
+        await comment.save();
+        res.status(200).json(comment);
+    }
+    catch(error){
+
+    }
+};

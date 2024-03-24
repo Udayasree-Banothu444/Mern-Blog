@@ -15,7 +15,7 @@ router.put('/update/:userId',verifyToken,  updateUser); //just to update we use 
 router.delete('/delete/:userId', verifyToken, deleteUser); //to delete an account in posts
 router.post('/signout', signout); //to signout here no need of token blz anyone can do signout
 router.get('/getusers',verifyToken, getUsers); //to check the data of all users and only admins can see it
-router.get('/:userId', getUser);
+router.get('/:userId', getUser); //this is to get the data of user fro both user&admin while commenting/to see comments
 
 
 export default router;
