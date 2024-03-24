@@ -61,3 +61,30 @@ export const likeComment = async (req, res, next)=>{
 
     }
 };
+
+
+
+//to edit the comment
+export const editComment = async(req, res, next)=>{
+    try{
+        const comment = await Comment.findById(req.params.commentId);
+        if(!comment){
+            return next(errorHandler(404, 'Comment not found'));
+        }
+        //check if the person is owner of the comment / admin
+        if(comment.userId !== req.user.id && !req.user.isAdmin){
+            return next(errorHandler(404, 'You are not allowed to edit this comment'));
+        }
+        const editedComment = await Comment.findByIdAndUpdate(
+            req.params.commentId,{
+                content: req.body.content,
+            },
+            {
+                new: true
+            }
+        );
+    }
+    catch(error){
+       next(error);
+    }
+};
