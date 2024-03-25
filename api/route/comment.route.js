@@ -5,6 +5,7 @@ import { getPostComments } from "../controllers/comment.controller.js";
 import { likeComment } from "../controllers/comment.controller.js";
 import { editComment } from "../controllers/comment.controller.js";
 import { deleteComment } from "../controllers/comment.controller.js";
+import { getcomments } from "../controllers/comment.controller.js";
 
 
 
@@ -15,4 +16,5 @@ router.get('/getPostComments/:postId', getPostComments);//to get the commnets of
 router.put('/likeComment/:commentId', verifyToken, likeComment); //to like the comment only once per user per comment
 router.put('/editComment/:commentId', verifyToken, editComment); //to edit a comment only admin / owner of the comment
 router.delete('/deleteComment/:commentId', verifyToken, deleteComment); //to delete the comment
+router.get('/getcomments',verifyToken, getcomments); //to get commnets in the comments in dashboard page
 export default router;
