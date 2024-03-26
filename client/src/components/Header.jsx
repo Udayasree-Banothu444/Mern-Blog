@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Avatar, Button, Dropdown, DropdownDivider, Navbar, TextInput } from 'flowbite-react'
-import { Link ,useLocation} from 'react-router-dom'//when you click that it will go to that page without refreshing the current page
+import { Link ,useLocation, useNavigate} from 'react-router-dom'//when you click that it will go to that page without refreshing the current page
 import {AiOutlineSearch} from 'react-icons/ai'
 import {FaMoon, FaSun} from 'react-icons/fa'
 import {useSelector, useDispatch} from 'react-redux' //this will give the info if the user is authenticated or not
  //import { UseDispatch } from 'react-redux' //will give the functionality
 import { toogleTheme } from '../redux/theme/themeSlice.js' //to change the theme
 import { signoutSuccess } from '../redux/user/userSlice.js'
+import { useState } from 'react'
+
 
 
 export default function Header() {
@@ -15,6 +17,23 @@ export default function Header() {
     const {currentUser} = useSelector(state => state.user); //givs the currentuser info
     const dispatch = useDispatch();
     const {theme} =useSelector(state =>state.theme);//to get the theme
+ 
+    //FOR SEARCH IN HOME PAGE
+    const [searchTerm, setSearchTerm] = useState(' '); //for search term
+    const location=useLocation();
+    const navigate = useNavigate();
+    // console.log(searchTerm);
+
+    useEffect(()=>{ //change the search bar and the route at the same time vice versa
+        const urlParams = new URLSearchParams(location.search);
+        const searchTermFromUrl = urlParams.get('searchTerm');
+        if(searchTermFromUrl){
+            setSearchTerm(searchTermFromUrl);
+        }
+
+    },[location.search]);
+
+    //SEARCH END
 
    //for signout in header component
     const handleSignout =async()=>{
@@ -37,6 +56,16 @@ export default function Header() {
       };
 
 
+    //handlesubmit when we click on search button
+    const handleSubmit = (e)=>{
+        e.preventDefault();
+        const urlParams = new URLSearchParams(location.search);
+        urlParams.set('searchTerm', searchTerm);
+        const searchQuery = urlParams.toString();
+        navigate(`/search?${searchQuery}`);
+    };
+
+
   return (
     // <div>Header</div>
     //<Navbar>Header</Navbar> just to move side wase a little bit
@@ -53,13 +82,15 @@ export default function Header() {
             4)rounded-lg : rounding the borders of the block
             5) text-white :whatsoever mode is it in just make the text colour white */}
         </Link>
-        <form >
+        <form onSubmit={handleSubmit} >
             <TextInput
                   type='text'
-                  placeholder='Search..'
+                  placeholder='Search...'
                   rightIcon={AiOutlineSearch}
                   className='hidden lg:inline'
-                  //the search button willnot be visible when the screen is short but when big the icon is visible            
+                  //the search button willnot be visible when the screen is short but when big the icon is visible 
+                  value={searchTerm} //on changing link it will change the searchbar value also
+                  onChange={(e)=>setSearchTerm(e.target.value)}  //changing the serachbar it changes the link           
             />
         </form>
 
