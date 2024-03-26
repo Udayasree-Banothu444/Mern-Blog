@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser';
 import postRoutes from './route/post.route.js';
 import commentRoutes from './route/comment.route.js';
 
+import path from 'path';
+
 dotenv.config();
 mongoose
   .connect( process.env.MONGO)
@@ -16,6 +18,8 @@ mongoose
 .catch((err) =>{
     console.log(err);
 });
+
+const __dirname = path.resolve();
 
 const app= express();
 app.use(express.json()); //this will allow insomia to take input in backend
@@ -31,6 +35,12 @@ app.use('/api/user',userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/post', postRoutes);
 app.use('/api/comment', commentRoutes);
+
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+app.get('*', (req, res)=>{
+    res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
 
 
 
