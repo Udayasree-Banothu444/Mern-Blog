@@ -55,6 +55,7 @@ export default function Search() {
         }
       }
     }
+    fetchPosts();
 
   },[location.search]);
 

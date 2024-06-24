@@ -17,62 +17,62 @@ export default function DashboardComp() {
     const [lastMonthComments,setLastMonthComments]= useState(0);
     const [lastMonthUsers, setLastMonthUsers] = useState(0);
 
-    const currentUser = useSelector((state)=>state.user)
+    const {currentUser} = useSelector((state)=>state.user)
 
     useEffect(()=>{
         const fetchUsers = async()=>{
             try{
-                const res= await fetch (`/api/user/getusers?limit=5`)
-                const data = await res.json()
+                const res= await fetch ('/api/user/getusers?limit=5');
+                const data = await res.json();
                 if(res.ok){
-                    setUsers(data.users)
-                    setTotalUsers(data.totalUsers)
-                    setLastMonthComments(data.lastMonthUsers)
+                    setUsers(data.users);
+                    setTotalUsers(data.totalUsers);
+                    setLastMonthUsers(data.lastMonthUsers);
                 }
             }
             catch(error){
                 console.log(error.message);
             }
-        }
+        };
         
 
         const fetchPosts = async()=>{
             try{
-                const res= await fetch (`/api/post/getposts?limit=5`)
-                const data = await res.json()
+                const res= await fetch ('/api/post/getposts?limit=5');
+                const data = await res.json();
                 if(res.ok){
-                    setPosts(data.posts)
-                    setTotalPosts(data.totalPosts)
-                    setLastMonthPosts(data.lastMonthPosts)
+                    setPosts(data.posts);
+                    setTotalPosts(data.totalPosts);
+                    setLastMonthPosts(data.lastMonthPosts);
                 }
             }
             catch(error){
                 console.log(error.message);
             }
-        }
+        };
 
         const fetchComments = async()=>{
             try{
-                const res= await fetch (`/api/comments/getcomments?limit=5`)
-                const data = await res.json()
+                const res= await fetch ('/api/comment/getcomments?limit=5');
+                const data = await res.json();
                 if(res.ok){
-                    setComments(data.comments)
-                    setTotalComments(data.setTotalComments)
-                    setLastMonthComments(data.lastMonthComments)
+                    setComments(data.comments);
+                    setTotalComments(data.totalComments);
+                    setLastMonthComments(data.lastMonthComments);
                 }
             }
             catch(error){
                 console.log(error.message);
             }
             
-        }
+        };
         if(currentUser.isAdmin){
             fetchUsers();
             fetchPosts();
             fetchComments();
         }
 
-    },[currentUser])
+    },[currentUser]);
 
   return (
     <div className='p-3 md:mx-auto'>
@@ -175,7 +175,7 @@ export default function DashboardComp() {
                             </Table.Cell>
 
                             <Table.Cell>
-                                {user.Username}
+                                {user.username}
                             </Table.Cell>
 
                         </Table.Row>
